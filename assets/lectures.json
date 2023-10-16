@@ -1,16 +1,18 @@
 [
   {
-    "name": "fundaments of artificial intelligence",
+    "name": "Fundaments of artificial intelligence",
     "code": "FAI",
-    "current": [25, 10],
+    "current": [29, 9],
     "lectures": [
-      [22, 10],
-      [25, 10],
+      [29, 9],
+      [2, 10],
+      [3, 10],
+      [16, 10],
       [2, 11]
     ]
   },
   {
-    "name": "analisi matematica 2",
+    "name": "Analisi matematica 2",
     "code": "AM2",
     "current": [12, 11],
     "lectures": [
@@ -21,13 +23,27 @@
     ]
   },
   {
-    "name": "chimica generale",
+    "name": "Chimica generale",
     "code": "CG",
-    "current": [],
+    "current": [0, 0],
     "lectures": [
       [26, 10],
       [28, 10],
       [13, 11]
+    ]
+  },
+  {
+    "name": "Logica e algebra",
+    "code": "LeA",
+    "current": [13, 10],
+    "lectures": [
+      [17, 9],
+      [11, 10],
+      [13, 10],
+      [14, 10],
+      [16, 10],
+      [17, 10],
+      [2, 11]
     ]
   }
 ]
