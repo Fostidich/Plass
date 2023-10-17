@@ -95,7 +95,7 @@ def cmd_step(code):
             idx = i
             break
     if idx == -1:
-        print("Course provided do not exists!")
+        print("Course provided do not exists")
         return
     course = content_list[idx]
     curr_date = Date(course['current'][0], course['current'][1])
@@ -133,7 +133,7 @@ def cmd_back(code):
             idx = i
             break
     if idx == -1:
-        print("Course provided do not exists!")
+        print("Course provided do not exists")
         return
     course = content_list[idx]
     curr_date = Date(course['current'][0], course['current'][1])
@@ -171,7 +171,7 @@ def cmd_get(code):
             idx = i
             break
     if idx == -1:
-        print("Course provided do not exists!")
+        print("Course provided do not exists")
         return
     course = content_list[idx]
     curr_date = Date(course['current'][0], course['current'][1])
@@ -218,7 +218,7 @@ def cmd_add(code, date):
             idx = i
             break
     if idx == -1:
-        print("Course provided do not exists!")
+        print("Course provided do not exists")
         return
     course = content_list[idx]
     curr_date = Date(course['current'][0], course['current'][1])
@@ -257,7 +257,47 @@ def cmd_add(code, date):
 
 
 def cmd_remove(code, date):
-    print(f"removing {date} from {code}")
+    date = date.split('-')
+    try:
+        date = [int(date[0]), int(date[1])]
+    except ValueError:
+        print("Not a date")
+        return
+    with open(FILE_PATH, 'r') as json_file:
+        content = json_file.read()
+    content_list = json.loads(content)
+    idx = -1
+    for i in range(len(content_list)):
+        if content_list[i]['code'] == code:
+            idx = i
+            break
+    if idx == -1:
+        print("Course provided do not exists")
+        return
+    course = content_list[idx]
+    curr_date = Date(course['current'][0], course['current'][1])
+    course = Course(course['name'],
+                    course['code'],
+                    curr_date,
+                    course['lectures'])
+    if Date(date[0], date[1]).equals(curr_date):
+        index = course.lectures.index(date)
+        if index == len(course.lectures)-1:
+            content_list[idx]['current'] = [0, 0]
+        else:
+            content_list[idx]['current'] = course.lectures[index+1]
+    if date in course.lectures:
+        course.lectures.remove(date)
+    else:
+        print("Lecture date not found")
+        return
+    content_list[idx]['lectures'] = course.lectures
+    content = json.dumps(content_list)
+    with open(FILE_PATH, 'w') as json_file:
+        json_file.write(content)
+    print()
+    print_content(content_list)
+    print(f"\nLecture of {Date(date[0], date[1])} removed from {code}")
 
 
 def cmd_create(code, name):
@@ -304,27 +344,27 @@ if not os.path.exists(FILE_PATH):
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         print("No arguments provided! Use \"plass help\" to get a list of commands")
-    elif sys.argv[1] == "show":
+    elif sys.argv[1] == "show" and len(sys.argv) == 2:
         cmd_show()
-    elif sys.argv[1] == "step":
+    elif sys.argv[1] == "step" and len(sys.argv) == 3:
         cmd_step(sys.argv[2])
-    elif sys.argv[1] == "back":
+    elif sys.argv[1] == "back" and len(sys.argv) == 3:
         cmd_back(sys.argv[2])
-    elif sys.argv[1] == "get":
+    elif sys.argv[1] == "get" and len(sys.argv) == 3:
         cmd_get(sys.argv[2])
-    elif sys.argv[1] == "add":
+    elif sys.argv[1] == "add" and len(sys.argv) == 4:
         cmd_add(sys.argv[2], sys.argv[3])
-    elif sys.argv[1] == "remove":
+    elif sys.argv[1] == "remove" and len(sys.argv) == 4:
         cmd_remove(sys.argv[2], sys.argv[3])
-    elif sys.argv[1] == "create":
+    elif sys.argv[1] == "create" and len(sys.argv) == 4:
         cmd_create(sys.argv[2], sys.argv[3])
-    elif sys.argv[1] == "import":
+    elif sys.argv[1] == "import" and len(sys.argv) == 3:
         cmd_import(sys.argv[2])
-    elif sys.argv[1] == "reset":
+    elif sys.argv[1] == "reset" and len(sys.argv) == 3:
         cmd_reset(sys.argv[2])
-    elif sys.argv[1] == "delete":
+    elif sys.argv[1] == "delete" and len(sys.argv) == 3:
         cmd_delete(sys.argv[2])
-    elif sys.argv[1] == "help":
+    elif sys.argv[1] == "help" and len(sys.argv) == 2:
         cmd_help()
     else:
         print("Unknown argument! Use \"plass help\" to get a list of commands")
