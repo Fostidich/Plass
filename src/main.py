@@ -69,11 +69,17 @@ class Course:
 
 
 def print_content(content_list):
+    if len(content_list) == 0:
+        print("\t[ NO COURSE FOUND ]")
     for course in content_list:
         print("\t" + repr(Course(course['name'],
                                  course['code'],
                                  Date(course['current'][0], course['current'][1]),
                                  course['lectures'])))
+    global tot
+    res = tot
+    tot = 0
+    return res
 
 
 def cmd_show():
@@ -81,8 +87,8 @@ def cmd_show():
         content = json_file.read()
     content_list = json.loads(content)
     print()
-    print_content(content_list)
-    print(f"\nYou are a total of {tot} lectures behind")
+    t = print_content(content_list)
+    print(f"\nYou are a total of {t} lectures behind")
 
 
 def cmd_step(code):
@@ -98,6 +104,9 @@ def cmd_step(code):
         print("Course provided do not exists")
         return
     course = content_list[idx]
+    if len(course['lectures']) == 0:
+        print("No lectures for this course")
+        return
     curr_date = Date(course['current'][0], course['current'][1])
     if curr_date.day == 0:
         print("Course has no more lectures!")
@@ -136,6 +145,9 @@ def cmd_back(code):
         print("Course provided do not exists")
         return
     course = content_list[idx]
+    if len(course['lectures']) == 0:
+        print("No lectures for this course")
+        return
     curr_date = Date(course['current'][0], course['current'][1])
     course = Course(course['name'],
                     course['code'],
@@ -174,6 +186,9 @@ def cmd_get(code):
         print("Course provided do not exists")
         return
     course = content_list[idx]
+    if len(course['lectures']) == 0:
+        print("No lectures for this course")
+        return
     curr_date = Date(course['current'][0], course['current'][1])
     course = Course(course['name'],
                     course['code'],
@@ -247,6 +262,8 @@ def cmd_add(code, date):
             course.lectures[i] = temp
             temp = temp2
         course.lectures.append(temp)
+    if course.current.equals(Date(0, 1)):
+        content_list[idx]['current'] = course.lectures[0]
     content_list[idx]['lectures'] = course.lectures
     content = json.dumps(content_list)
     with open(FILE_PATH, 'w') as json_file:
@@ -291,6 +308,8 @@ def cmd_remove(code, date):
     else:
         print("Lecture date not found")
         return
+    if len(course.lectures) == 0:
+        content_list[idx]['current'] = [0, 1]
     content_list[idx]['lectures'] = course.lectures
     content = json.dumps(content_list)
     with open(FILE_PATH, 'w') as json_file:
@@ -301,7 +320,48 @@ def cmd_remove(code, date):
 
 
 def cmd_create(code, name):
-    print(f"creating {name} with {code}")
+    name = ''.join([' ' if char == '_' else char for char in name])
+    with open(FILE_PATH, 'r') as json_file:
+        content = json_file.read()
+    content_list = json.loads(content)
+    for c in content_list:
+        if c['name'] == name or c['code'] == code:
+            print("Course name or code already in use")
+            return
+    course = {
+        'name': name,
+        'code': code,
+        'current': [0, 1],
+        'lectures': []
+    }
+    content_list.append(course)
+    content = json.dumps(content_list)
+    with open(FILE_PATH, 'w') as json_file:
+        json_file.write(content)
+    print()
+    print_content(content_list)
+    print(f"\nCourse \"{name}\" ({code}) added")
+
+
+def cmd_delete(code):
+    with open(FILE_PATH, 'r') as json_file:
+        content = json_file.read()
+    content_list = json.loads(content)
+    name = None
+    for c in content_list:
+        if c['code'] == code:
+            name = c['name']
+            content_list.remove(c)
+            break
+    if name is None:
+        print("Course not found")
+        return
+    content = json.dumps(content_list)
+    with open(FILE_PATH, 'w') as json_file:
+        json_file.write(content)
+    print()
+    print_content(content_list)
+    print(f"\nCourse \"{name}\" ({code}) deleted")
 
 
 def cmd_import(code):
@@ -309,11 +369,54 @@ def cmd_import(code):
 
 
 def cmd_reset(code):
-    print(f"resetting {code}")
+    with open(FILE_PATH, 'r') as json_file:
+        content = json_file.read()
+    content_list = json.loads(content)
+    name = None
+    for c in content_list:
+        if c['code'] == code:
+            name = c['name']
+            if c['current'] == [0, 1]:
+                print("Course has no lecture to be seen")
+                return
+            c['current'] = c['lectures'][0]
+            break
+    if name is None:
+        print("Course not found")
+        return
+    content = json.dumps(content_list)
+    with open(FILE_PATH, 'w') as json_file:
+        json_file.write(content)
+    print()
+    print_content(content_list)
+    print(f"\nLectures of course \"{name}\" ({code}) now have all been set to be seen")
 
 
-def cmd_delete(code):
-    print(f"deleting {code}")
+def cmd_finish(code):
+    with open(FILE_PATH, 'r') as json_file:
+        content = json_file.read()
+    content_list = json.loads(content)
+    name = None
+    for c in content_list:
+        if c['code'] == code:
+            name = c['name']
+            if c['current'] == [0, 0]:
+                print("Course finished already")
+                return
+            if c['current'] == [0, 1]:
+                print("Course has no lectures that could have been seen")
+                return
+            c['current'] = [0, 0]
+            break
+    if name is None:
+        print("Course not found")
+        return
+    content = json.dumps(content_list)
+    with open(FILE_PATH, 'w') as json_file:
+        json_file.write(content)
+    print()
+    print_content(content_list)
+    print(f"\nCourse \"{name}\" ({code}) set as completed")
 
 
 def cmd_help():
@@ -327,11 +430,11 @@ def cmd_help():
           f"\t{white}plass add [course] [date] \u27A4 {reset}adds the lesson date to the stack of the course\n" +
           f"\t{white}plass remove [course] [date] \u27A4 {reset}removes the lesson date from the stack of the course\n" +
           f"\t{white}plass create [course] [name] \u27A4 {reset}creates a new course\n" +
+          f"\t{white}plass delete [course] \u27A4 {reset}deletes the full course\n" +
           f"\t{white}plass import [course] < \"file.txt\" \u27A4 {reset}adds all the lectures dates to the course\n" +
           f"\t{white}plass reset [course] \u27A4 {reset}sets the current lecture date to the first of the list\n" +
-          f"\t{white}plass delete [course] \u27A4 {reset}deletes the full course\n" +
-          f"\t{white}plass help \u27A4 {reset}opens this very view\n" +
-          "\n")
+          f"\t{white}plass finish [course] \u27A4 {reset}sets all the lecture as seen\n" +
+          f"\t{white}plass help \u27A4 {reset}opens this very view\n")
 
 
 directory = os.path.dirname(FILE_PATH)
@@ -358,12 +461,14 @@ if __name__ == '__main__':
         cmd_remove(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "create" and len(sys.argv) == 4:
         cmd_create(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "delete" and len(sys.argv) == 3:
+        cmd_delete(sys.argv[2])
     elif sys.argv[1] == "import" and len(sys.argv) == 3:
         cmd_import(sys.argv[2])
     elif sys.argv[1] == "reset" and len(sys.argv) == 3:
         cmd_reset(sys.argv[2])
-    elif sys.argv[1] == "delete" and len(sys.argv) == 3:
-        cmd_delete(sys.argv[2])
+    elif sys.argv[1] == "finish" and len(sys.argv) == 3:
+        cmd_finish(sys.argv[2])
     elif sys.argv[1] == "help" and len(sys.argv) == 2:
         cmd_help()
     else:
