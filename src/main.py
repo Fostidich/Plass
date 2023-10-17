@@ -23,6 +23,14 @@ class Date:
     def equals(self, other):
         return self.day == other.day and self.month == other.month
 
+    def is_before(self, other):
+        if self.month < other.month:
+            return True
+        if self.month > other.month:
+            return False
+        if self.day < other.day:
+            return True
+
     def is_before_or_equals(self, other):
         if self.month < other.month:
             return True
@@ -68,7 +76,7 @@ def print_content(content_list):
                                  course['lectures'])))
 
 
-def get():
+def show():
     with open(FILE_PATH, 'r') as json_file:
         content = json_file.read()
     content_list = json.loads(content)
@@ -78,6 +86,7 @@ def get():
 
 
 def step(code):
+    # noinspection DuplicatedCode
     with open(FILE_PATH, 'r') as json_file:
         content = json_file.read()
     content_list = json.loads(content)
@@ -115,12 +124,67 @@ def step(code):
     print(f"\nLecture of {curr_date} for {code} completed")
 
 
-def add():
-    print("add function")
+def get(code):
+    # noinspection DuplicatedCode
+    with open(FILE_PATH, 'r') as json_file:
+        content = json_file.read()
+    content_list = json.loads(content)
+    idx = -1
+    for i in range(len(content_list)):
+        if content_list[i]['code'] == code:
+            idx = i
+            break
+    if idx == -1:
+        print("Course provided do not exists!")
+        return
+    course = content_list[idx]
+    curr_date = Date(course['current'][0], course['current'][1])
+    course = Course(course['name'],
+                    course['code'],
+                    curr_date,
+                    course['lectures'])
+    print()
+    gray = "\033[1;30m"
+    orange = "\033[1;33m"
+    white = "\033[1;37m"
+    reset = "\033[0m"
+    current_date = datetime.now()
+    today = Date(current_date.day, current_date.month)
+    for el in course.lectures:
+        date = Date(el[0], el[1])
+        if curr_date.day == 0:
+            print(f"{gray}\t[ {date} ]{reset}")
+            continue
+        if date.is_before(curr_date):
+            print(f"{gray}\t[ {date} ]{reset}")
+            continue
+        if date.is_before_or_equals(today) and not date.is_before(curr_date):
+            print(f"{orange}\t[ {date} ]{reset}")
+            continue
+        if not date.is_before_or_equals(today) and not date.is_before(curr_date):
+            print(f"{white}\t[ {date} ]{reset}")
+    print()
 
 
-def remove():
-    print("remove command")
+def add(code, date):
+    print(f"adding {date} to {code}")
+
+
+def remove(code, date):
+    print(f"removing {date} from {code}")
+
+
+def help():
+    white = "\033[1;37m"
+    reset = "\033[0m"
+    print("Usage: use \"plass\" followed by a command and the respective arguments\n\n" +
+          f"\t{white}plass show \u27A4 {reset}prints all the courses info\n" +
+          f"\t{white}plass step [course] \u27A4 {reset}marks the current lesson for the course as seen\n" +
+          f"\t{white}plass get [course] \u27A4 {reset}prints the full stack of lessons dates for the course\n" +
+          f"\t{white}plass add [course] [date] \u27A4 {reset}adds the lesson date to the stack of the course\n" +
+          f"\t{white}plass remove [course] [date] \u27A4 {reset}removes the lesson date from the stack of the course\n" +
+          f"\t{white}plass help \u27A4 {reset}opens this very view\n" +
+          "\n")
 
 
 directory = os.path.dirname(FILE_PATH)
@@ -132,14 +196,18 @@ if not os.path.exists(FILE_PATH):
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        print("no arguments")
-    elif sys.argv[1] == "get":
-        get()
+        print("No arguments provided! Use \"plass help\" to get a list of commands")
+    elif sys.argv[1] == "show":
+        show()
     elif sys.argv[1] == "step":
         step(sys.argv[2])
+    elif sys.argv[1] == "get":
+        get(sys.argv[2])
     elif sys.argv[1] == "add":
-        add()
+        add(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "remove":
-        remove()
+        remove(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "help":
+        help()
     else:
-        print("unknown argument")
+        print("Unknown argument! Use \"plass help\" to get a list of commands")
