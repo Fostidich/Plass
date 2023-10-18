@@ -47,7 +47,7 @@ class Course:
         reset = "\033[0m"
         if self.current.day == 0:
             gray = "\033[1;30m"
-            return f"{gray}[0 \u27A4 {self.current}] {self.code:4s} {self.name}{reset}"
+            return f"{gray}[0  \u27A4 {self.current}] {self.code:4s} {self.name}{reset}"
         current_date = datetime.now()
         today = Date(current_date.day, current_date.month)
         i = 0
@@ -59,9 +59,9 @@ class Course:
                 tot += 1
         if i == 0:
             white = "\033[1;37m"
-            return f"{white}[{i} \u27A4 {self.current}] {self.code:4s} {self.name}{reset}"
+            return f"{white}[{str(i) + ' ' if i < 10 else i} \u27A4 {self.current}] {self.code:4s} {self.name}{reset}"
         orange = "\033[1;33m"
-        return f"{orange}[{i} \u27A4 {self.current}] {self.code:4s} {self.name}{reset}"
+        return f"{orange}[{str(i) + ' ' if i < 10 else i} \u27A4 {self.current}] {self.code:4s} {self.name}{reset}"
 
 
 def print_content(content_list):
