@@ -258,8 +258,8 @@ def cmd_add(code, date):
             course.lectures[i] = temp
             temp = temp2
         course.lectures.append(temp)
-    if course.current.equals(Date(0, 1)):
-        content_list[idx]['current'] = course.lectures[0]
+    if course.current.day == 0:
+        content_list[idx]['current'] = [date.day, date.month]
     content_list[idx]['lectures'] = course.lectures
     content = json.dumps(content_list)
     with open(FILE_PATH, 'w') as json_file:
