@@ -6,6 +6,7 @@ from datetime import datetime
 FILE_PATH = "plass-data/lectures.json"
 
 tot = 0
+additions = 0
 
 
 class Date:
@@ -101,7 +102,7 @@ def cmd_step(code):
             idx = i
             break
     if idx == -1:
-        print("Course provided do not exists")
+        print("Course provided do not exist")
         return
     course = content_list[idx]
     if len(course['lectures']) == 0:
@@ -142,7 +143,7 @@ def cmd_back(code):
             idx = i
             break
     if idx == -1:
-        print("Course provided do not exists")
+        print("Course provided do not exist")
         return
     course = content_list[idx]
     if len(course['lectures']) == 0:
@@ -183,7 +184,7 @@ def cmd_get(code):
             idx = i
             break
     if idx == -1:
-        print("Course provided do not exists")
+        print("Course provided do not exist")
         return
     course = content_list[idx]
     if len(course['lectures']) == 0:
@@ -233,7 +234,7 @@ def cmd_add(code, date):
             idx = i
             break
     if idx == -1:
-        print("Course provided do not exists")
+        print("Course provided do not exist")
         return
     course = content_list[idx]
     curr_date = Date(course['current'][0], course['current'][1])
@@ -246,7 +247,7 @@ def cmd_add(code, date):
     for i in range(len(course.lectures)):
         temp = Date(course.lectures[i][0], course.lectures[i][1])
         if date.equals(temp):
-            print("Lecture date is present already")
+            print("Date is present already")
             return
         if date.is_before(temp):
             idx2 = i
@@ -257,7 +258,7 @@ def cmd_add(code, date):
     else:
         temp = course.lectures[idx2]
         course.lectures[idx2] = [date.day, date.month]
-        for i in range(idx2+1, len(course.lectures)):
+        for i in range(idx2 + 1, len(course.lectures)):
             temp2 = course.lectures[i]
             course.lectures[i] = temp
             temp = temp2
@@ -271,6 +272,8 @@ def cmd_add(code, date):
     print()
     print_content(content_list)
     print(f"\nLecture of {date} added for {code}")
+    global additions
+    additions += 1
 
 
 def cmd_remove(code, date):
@@ -289,7 +292,7 @@ def cmd_remove(code, date):
             idx = i
             break
     if idx == -1:
-        print("Course provided do not exists")
+        print("Course provided do not exist")
         return
     course = content_list[idx]
     curr_date = Date(course['current'][0], course['current'][1])
@@ -299,10 +302,10 @@ def cmd_remove(code, date):
                     course['lectures'])
     if Date(date[0], date[1]).equals(curr_date):
         index = course.lectures.index(date)
-        if index == len(course.lectures)-1:
+        if index == len(course.lectures) - 1:
             content_list[idx]['current'] = [0, 0]
         else:
-            content_list[idx]['current'] = course.lectures[index+1]
+            content_list[idx]['current'] = course.lectures[index + 1]
     if date in course.lectures:
         course.lectures.remove(date)
     else:
@@ -354,7 +357,7 @@ def cmd_delete(code):
             content_list.remove(c)
             break
     if name is None:
-        print("Course not found")
+        print("Course provided do not exist")
         return
     content = json.dumps(content_list)
     with open(FILE_PATH, 'w') as json_file:
@@ -365,7 +368,19 @@ def cmd_delete(code):
 
 
 def cmd_import(code):
-    print(f"imported dates for {code}")
+    original_stdout = sys.stdout
+    from io import StringIO
+    sys.stdout = StringIO()
+    while True:
+        try:
+            line = input()
+            if not line:
+                break
+            cmd_add(code, line)
+        except EOFError:
+            break
+    sys.stdout = original_stdout
+    print(f"{additions} dates added for {code}")
 
 
 def cmd_reset(code):
@@ -382,7 +397,7 @@ def cmd_reset(code):
             c['current'] = c['lectures'][0]
             break
     if name is None:
-        print("Course not found")
+        print("Course provided do not exist")
         return
     content = json.dumps(content_list)
     with open(FILE_PATH, 'w') as json_file:
@@ -409,7 +424,7 @@ def cmd_finish(code):
             c['current'] = [0, 0]
             break
     if name is None:
-        print("Course not found")
+        print("Course provided do not exist")
         return
     content = json.dumps(content_list)
     with open(FILE_PATH, 'w') as json_file:
@@ -417,6 +432,33 @@ def cmd_finish(code):
     print()
     print_content(content_list)
     print(f"\nCourse \"{name}\" ({code}) set as completed")
+
+
+def cmd_example():
+    gray = "\033[1;30m"
+    white = "\033[1;37m"
+    reset = "\033[0m"
+    print("Usage: use \"plass\" followed by a command and the respective arguments\n" +
+          "\n" + gray +
+          f"\t[5 ➤ 10-08] FAI  Fundaments of artificial intelligence\n" +
+          f"\t[0 ➤ 12-11] AM2  Analisi matematica 2\n" +
+          f"\t[0 ➤  --- ] LeA  Logica e algebra\n" +
+          f"\t[4 ➤ 10-10] CG   Chimica generale\n" +
+          reset + "\n" +
+          f"\t{white}plass show \u27A4 {reset}plass show\n" +
+          f"\t{white}plass step [course] \u27A4 {reset}plass step FAI\n" +
+          f"\t{white}plass back [course] \u27A4 {reset}plass back FAI\n" +
+          f"\t{white}plass get [course] \u27A4 {reset}plass get GC\n" +
+          f"\t{white}plass add [course] [date] \u27A4 {reset}plass add LeA 20-11\n" +
+          f"\t{white}plass remove [course] [date] \u27A4 {reset}plass remove LeA 20-11\n" +
+          f"\t{white}plass create [course] [name] \u27A4 {reset}plass create TdS Teoria_dei_sistemi\n" +
+          f"\t{white}plass delete [course] \u27A4 {reset}plass delete TdS\n" +
+          f"\t{white}plass import [course] < \"dates.txt\" \u27A4 {reset}plass import CG < Documents/untitled.txt\n" +
+          f"\t{white}plass reset [course] \u27A4 {reset}plass reset FAI\n" +
+          f"\t{white}plass finish [course] \u27A4 {reset}plass finish FAI\n" +
+          f"\t{white}plass example \u27A4 {reset}plass example\n" +
+          f"\t{white}plass help \u27A4 {reset}plass help\n" +
+          "\nPlease feel free to open a discussion/issue on https://github.com/Fostidich/Plass if you encounter any issues or have questions")
 
 
 def cmd_help():
@@ -431,10 +473,12 @@ def cmd_help():
           f"\t{white}plass remove [course] [date] \u27A4 {reset}removes the lesson date from the stack of the course\n" +
           f"\t{white}plass create [course] [name] \u27A4 {reset}creates a new course\n" +
           f"\t{white}plass delete [course] \u27A4 {reset}deletes the full course\n" +
-          f"\t{white}plass import [course] < \"file.txt\" \u27A4 {reset}adds all the lectures dates to the course\n" +
+          f"\t{white}plass import [course] < \"dates.txt\" \u27A4 {reset}adds all the lectures dates to the course\n" +
           f"\t{white}plass reset [course] \u27A4 {reset}sets the current lecture date to the first of the list\n" +
-          f"\t{white}plass finish [course] \u27A4 {reset}sets all the lecture as seen\n" +
-          f"\t{white}plass help \u27A4 {reset}opens this very view\n")
+          f"\t{white}plass finish [course] \u27A4 {reset}sets all the lectures as seen\n" +
+          f"\t{white}plass example \u27A4 {reset}opens the view for usage examples\n" +
+          f"\t{white}plass help \u27A4 {reset}opens this very view\n" +
+          "\nPlease feel free to open a discussion/issue on https://github.com/Fostidich/Plass if you encounter any issues or have questions")
 
 
 directory = os.path.dirname(FILE_PATH)
@@ -469,6 +513,8 @@ if __name__ == '__main__':
         cmd_reset(sys.argv[2])
     elif sys.argv[1] == "finish" and len(sys.argv) == 3:
         cmd_finish(sys.argv[2])
+    elif sys.argv[1] == "example" and len(sys.argv) == 2:
+        cmd_example()
     elif sys.argv[1] == "help" and len(sys.argv) == 2:
         cmd_help()
     else:
