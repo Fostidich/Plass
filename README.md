@@ -1,8 +1,8 @@
 # Plass
-Are you always some lecture behind? Now you can automatically get these planned out for you. Try it, it's simple!
+Keep track of your lessons (or whatever else) by storing dates. 
 
 ## Usage
-Keep track of the missed lectures
+This is a terminal line app, here are some examples.
 - Use <code>plass get</code> to see the full list
 - Use <code>plass step \[lecture]</code> to update the list
 - Use <code>plass help</code> or <code>plass example</code> to show all commands
