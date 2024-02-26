@@ -435,7 +435,7 @@ def cmd_example():
     reset = "\033[0m"
     print("Usage: use \"plass\" followed by a command and the respective arguments\n" +
           "\n" + gray +
-          f"\t[5 ➤ 10-08] FAI  Fundaments of artificial intelligence\n" +
+          f"\t[5 ➤ 10-08] FAI  Foundations of artificial intelligence\n" +
           f"\t[0 ➤ 12-11] AM2  Analisi matematica 2\n" +
           f"\t[0 ➤  --- ] LeA  Logica e algebra\n" +
           f"\t[4 ➤ 10-10] CG   Chimica generale\n" +
