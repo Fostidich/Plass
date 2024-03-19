@@ -2,13 +2,9 @@
 Keep track of your lessons (or whatever else) by storing dates. 
 
 ## Installation
-You can run the script with `python3 plass.py`, but i suggest creating an alias for easier usage.
-To achieve this:
-1. put the script (plass.py) into a desired folder, e.g. ~/Documents
-2. run `echo "alias plass=python3 ~/Documents/plass.py" >> ~/.bash_aliases` (change the script directory if you have set another)
-
-Another approach is to compile the script to an executable with PyInstaller.
-For simplicity sake, the usage section suppose the alias has been set. 
+To use the script you have to compile it to a binary using [PyInstaller](https://pyinstaller.org/en/stable/).
+You can then put the executable into the desired folder and run `./plass [COMMAND]`.
+I suggest adding this folder to the PATH variable and running `chmod +x plass` for easier global usage.
 
 ## Usage
 This is a terminal line app, here are some examples.
