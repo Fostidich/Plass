@@ -485,6 +485,16 @@ if not os.path.exists(FILE_PATH):
     with open(FILE_PATH, 'w') as file:
         file.write('[]')
 
+
+local_dir = os.path.expanduser('~/.local')
+directory = os.path.join(local_dir, "plass")
+FILE_PATH = os.path.join(directory, "lectures.json")
+if not os.path.exists(directory):
+    os.makedirs(directory)
+if not os.path.exists(FILE_PATH):
+    with open(FILE_PATH, 'w') as f:
+        json.dump([], f)
+
 tot = 0
 additions = 0
 
