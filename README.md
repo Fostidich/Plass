@@ -2,9 +2,9 @@
 Keep track of your lessons (or whatever else) by storing dates. 
 
 ## Installation
-To use the script you have to compile it to a binary using [PyInstaller](https://pyinstaller.org/en/stable/).
-You can then put the executable into the desired folder and run `./plass [COMMAND]`.
-I suggest adding this folder to the PATH variable and running `chmod +x plass` for easier global usage.
+Run the script with <code>python3 plass.py [COMMAND]</code>.
+You can store the script in any folder.
+To make it accessible from any location, consider creating an alias.
 
 ## Usage
 This is a terminal line app, here are some examples.
