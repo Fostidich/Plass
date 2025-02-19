@@ -476,16 +476,6 @@ def cmd_help():
           "\nPlease feel free to open a discussion/issue on https://github.com/Fostidich/Plass if you encounter any issues or have questions")
 
 
-executable_path = os.path.dirname(sys.executable)
-directory = os.path.join(executable_path, "plass-data")
-if not os.path.exists(directory):
-    os.makedirs(directory)
-FILE_PATH = os.path.join(directory, "lectures.json")
-if not os.path.exists(FILE_PATH):
-    with open(FILE_PATH, 'w') as file:
-        file.write('[]')
-
-
 local_dir = os.path.expanduser('~/.local')
 directory = os.path.join(local_dir, "plass")
 FILE_PATH = os.path.join(directory, "lectures.json")
